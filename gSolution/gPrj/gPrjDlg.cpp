@@ -278,10 +278,19 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 	int nHeight = m_pDlgImageColor->m_image.GetHeight();
 	int nPitch = m_pDlgImageColor->m_image.GetPitch();
 
-	// Number of circles and radius
+	
 	int nCount = m_nNum_CircleCnt;
 	int nRadius = m_nNum_Radius;
 	int nLimit = 0;
+
+	// 화이트로 초기화
+	for (int j = 0; j < nHeight; j++) {
+		for (int i = 0; i < nWidth; i++) {
+			fm[j * nPitch + i * 3] = 255; // Blue
+			fm[j * nPitch + i * 3 + 1] = 255; // Green
+			fm[j * nPitch + i * 3 + 2] = 255; // Red
+		}
+	}
 
 	// 두 중점사이의 거리
 	int minDistance = 2 * nRadius;
@@ -322,7 +331,7 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 
 		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, x, y, fm);
 
-		// Store the position of the new circle
+		// 중심점 배열에 추가
 		circles[k].x = x;
 		circles[k].y = y;
 	}
@@ -361,7 +370,6 @@ void CgPrjDlg::CalculateCentroid(int nRadius)
 				if (j == 0 || i == 0) {
 					int index = ((yCpos + j) * nPitch + (xCpos + i) * 3);
 
-					// Set RGB values (Assuming 24-bit image)
 					fm[index] = 0x00;       // Blue
 					fm[index + 1] = 0x00;   // Green
 					fm[index + 2] = 255;   // Red
