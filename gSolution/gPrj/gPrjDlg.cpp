@@ -123,12 +123,11 @@ BOOL CgPrjDlg::OnInitDialog()
 	m_pDlgImage->Create(IDD_DLGIMAGE, this);
 	m_pDlgImage->ShowWindow(SW_SHOW);
 
+
+	// 노란색 원을 그리기 위하여 24bit dlg를 생성
 	m_pDlgImageColor = new DlgImageColor;
 	m_pDlgImageColor->Create(IDD_DlgImageColor, this);
 	m_pDlgImageColor->ShowWindow(SW_SHOW);
-
-
-
 
 	m_pDlgImgResult = new CDlgImage;
 	m_pDlgImgResult->Create(IDD_DLGIMAGE, this);
@@ -274,18 +273,17 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 {
 	UpdateData(true);
 
-	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-	int nWidth = m_pDlgImage->m_image.GetWidth();
-	int nHeight = m_pDlgImage->m_image.GetHeight();
-	int nPitch = m_pDlgImage->m_image.GetPitch();
-	memset(fm, 0xff, nWidth * nHeight);
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
 
 	// Number of circles and radius
 	int nCount = m_nNum_CircleCnt;
 	int nRadius = m_nNum_Radius;
 	int nLimit = 0;
 
-	// Minimum distance between circle centers to avoid overlap
+	// 두 중점사이의 거리
 	int minDistance = 2 * nRadius;
 
 	// Generate non-overlapping circles
@@ -314,6 +312,10 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 			if (nLimit++ > SeedLimit) // 만약 원의 반지름이 너무커서 화면에 nCount만큼 원을 채우지 못하는 경우, 무한루프 방지
 			{
 				AfxMessageBox(_T("Radius is too large to fill the screen"));
+				
+				// 이 경우 circle을 초기화시켜줘야함
+				memset(circles, 0, sizeof(circles));
+
 				return;
 			}
 		} while (isOverlapping);
@@ -325,17 +327,18 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 		circles[k].y = y;
 	}
 
-	m_pDlgImage->Invalidate();
+	m_pDlgImageColor->Invalidate();
 
 }
 
+// 무게 중심 구하기
 void CgPrjDlg::CalculateCentroid(int nRadius)
 {
 
-	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-	int nWidth = m_pDlgImage->m_image.GetWidth();
-	int nHeight = m_pDlgImage->m_image.GetHeight();
-	int nPitch = m_pDlgImage->m_image.GetPitch();
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
 	int nCount = m_nNum_CircleCnt;
 	int crossLen = nRadius / 2;
 
@@ -352,60 +355,68 @@ void CgPrjDlg::CalculateCentroid(int nRadius)
 	xCpos = xSum / nCount;
 	yCpos = ySum / nCount;
 
-	// 십자가 만들기
+	// 중심선 긋기
 	for (int j = -crossLen; j <= crossLen; j++) {
 		for (int i = -crossLen; i <= crossLen; i++) {
 				if (j == 0 || i == 0) {
-					fm[(yCpos + j) * nPitch + (xCpos + i)] = 0x00;
+					int index = ((yCpos + j) * nPitch + (xCpos + i) * 3);
+
+					// Set RGB values (Assuming 24-bit image)
+					fm[index] = 0x00;       // Blue
+					fm[index + 1] = 0x00;   // Green
+					fm[index + 2] = 255;   // Red
 				}
 		}
 	}
 
 	DrawCircumference(nRadius, nWidth, nHeight, nPitch, xCpos, yCpos, fm);
 
-	m_pDlgImage->Invalidate();
+	m_pDlgImageColor->Invalidate();
 
 }
 
-
-// Draw the filled circle
+// 내부를 포함한 원 그리기
 void CgPrjDlg::DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm)
 {
 	for (int j = -nRadius; j <= nRadius; j++) {
 		for (int i = -nRadius; i <= nRadius; i++) {
-
-			if (x + i >= 0 && x + i < nWidth && y + j >= 0 && y + j < nHeight) {
+			
+			// 이미 중심 좌표가 벗어나지 않는 x,y값을 인수로 가지고 있기는 함.
+			if (x + i >= 0 && x + i < nWidth && y + j >= 0 && y + j < nHeight) { 
 				int distanceSquared = i * i + j * j;
 				if (distanceSquared <= nRadius * nRadius) {
-					fm[(y + j) * nPitch + (x + i)] = 0x00;
+					//fm[(y + j) * nPitch + (x + i)] = 0x00;
+					int index = (y + j) * nPitch + (x + i) * 3;
+					fm[index] = 0;         // Blue
+					fm[index + 1] = 0;     // Green
+					fm[index + 2] = 0;     // Red
 				}
 			}
 		}
 	}
 }
 
-// Draw the circumference
+// 원호그리기
 void CgPrjDlg::DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm)
 {
 	UpdateData(true);
 	
 	
-	// Draw the circumference of the circle
 	for (int angle = 0; angle < 360; angle++) {
 		int newX = x + static_cast<int>(nRadius * cos(angle * 3.141592 / 180.0));
 		int newY = y + static_cast<int>(nRadius * sin(angle * 3.141592 / 180.0));
 
 		if (newX >= 0 && newX < nWidth && newY >= 0 && newY < nHeight) {
-			fm[newY * nPitch + newX] = RGB(255,255,0);
+			int index = (newY * nPitch + newX * 3);
+
+			fm[index] = 0x00;       // Blue
+			fm[index + 1] = 255;   // Green
+			fm[index + 2] = 255;   // Red
 		}
 	}
 
-	m_pDlgImage->Invalidate();
+	m_pDlgImageColor->Invalidate();
 }
-
-
-
-
 
 void CgPrjDlg::OnBnClickedBtnGetData()
 {
