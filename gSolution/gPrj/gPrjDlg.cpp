@@ -10,6 +10,7 @@
 #include <iostream>
 using namespace std;
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -34,6 +35,7 @@ public:
 // 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
+
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -56,14 +58,17 @@ END_MESSAGE_MAP()
 CgPrjDlg::CgPrjDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_GPRJ_DIALOG, pParent)
 	, m_nNum_Radius(0)
+	, m_nNum_CircleCnt(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
 }
 
 void CgPrjDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_CIRCLE_RADIUS, m_nNum_Radius);
+	DDX_Text(pDX, IDC_CIRCLE_nCnt, m_nNum_CircleCnt);
 }
 
 BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
@@ -76,6 +81,7 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_MAKE_PATTERN, &CgPrjDlg::OnBnClickedBtnMakePattern)
 	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CgPrjDlg::OnBnClickedBtnGetData)
 	ON_BN_CLICKED(IDC_BTN_THREAD, &CgPrjDlg::OnBnClickedBtnThread)
+	ON_BN_CLICKED(IDC_BTN_CALC_CENTROID, &CgPrjDlg::OnBnClickedBtnCalcCentroid)
 END_MESSAGE_MAP()
 
 
@@ -258,40 +264,140 @@ void CgPrjDlg::OnBnClickedBtnProcess()
 
 void CgPrjDlg::OnBnClickedBtnMakePattern()
 {
-    UpdateData(true);
+	UpdateData(true);
 
-    unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-    int nWidth = m_pDlgImage->m_image.GetWidth();
-    int nHeight = m_pDlgImage->m_image.GetHeight();
-    int nPitch = m_pDlgImage->m_image.GetPitch();
-    memset(fm, 0xff, nWidth * nHeight);
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+	memset(fm, 0xff, nWidth * nHeight);
 
-    // Number of circles and radius
-    int nCount = 100;
-    int nRadius = m_nNum_Radius;
+	// Number of circles and radius
+	int nCount = m_nNum_CircleCnt;
+	int nRadius = m_nNum_Radius;
+	int nLimit = 0;
 
-    for (int k = 0; k < nCount; k++) {
-        int x = rand() % (nWidth - 2 * nRadius) + nRadius;
-        int y = rand() % (nHeight - 2 * nRadius) + nRadius;
+	// Minimum distance between circle centers to avoid overlap
+	int minDistance = 2 * nRadius;
 
-        // Draw the filled circle
-        for (int i = -nRadius; i <= nRadius; i++) {
-            for (int j = -nRadius; j <= nRadius; j++) {
-                if (x + i >= 0 && x + i < nWidth && y + j >= 0 && y + j < nHeight) {
-                    int distanceSquared = i * i + j * j;
-                    if (distanceSquared <= nRadius * nRadius) {
-                        fm[(y + j) * nPitch + (x + i)] = 0;
-                    }
-                }
-            }
-        }
-    }
+	// Generate non-overlapping circles
+	for (int k = 0; k < nCount; k++) {
+		int x, y;
+		bool isOverlapping;
 
-    m_pDlgImage->Invalidate();
+		do {
+			// Generate random position for the circle
+			x = rand() % (nWidth - 2 * nRadius) + nRadius;
+			y = rand() % (nHeight - 2 * nRadius) + nRadius;
 
+			// Check if the new circle overlaps with any existing circle
+			isOverlapping = false;
 
+			for (int i = 0; i < k; i++) {
+				int dx = abs(x - circles[i].x);
+				int dy = abs(y - circles[i].y);
+				int distanceSquared = dx * dx + dy * dy;
+
+				if (distanceSquared < minDistance * minDistance) {
+					isOverlapping = true;
+					break;
+				}
+			}
+			if (nLimit++ > SeedLimit) // 만약 원의 반지름이 너무커서 화면에 nCount만큼 원을 채우지 못하는 경우, 무한루프 방지
+			{
+				AfxMessageBox(_T("Radius is too large to fill the screen"));
+				return;
+			}
+		} while (isOverlapping);
+
+		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, x, y, fm);
+
+		// Store the position of the new circle
+		circles[k].x = x;
+		circles[k].y = y;
+	}
+
+	m_pDlgImage->Invalidate();
 
 }
+
+void CgPrjDlg::CalculateCentroid(int nRadius)
+{
+
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+	int nCount = m_nNum_CircleCnt;
+	int crossLen = nRadius / 2;
+
+	int xSum = 0 , ySum = 0;
+	int xCpos, yCpos;
+	bool isOverlapping;
+
+	for (int k = 0; k < nCount; k++) {
+
+		xSum += circles[k].x;
+		ySum += circles[k].y;
+	}
+	
+	xCpos = xSum / nCount;
+	yCpos = ySum / nCount;
+
+	// 십자가 만들기
+	for (int j = -crossLen; j <= crossLen; j++) {
+		for (int i = -crossLen; i <= crossLen; i++) {
+				if (j == 0 || i == 0) {
+					fm[(yCpos + j) * nPitch + (xCpos + i)] = 0x00;
+				}
+		}
+	}
+
+	DrawCircumference(nRadius, nWidth, nHeight, nPitch, xCpos, yCpos, fm);
+
+
+	m_pDlgImage->Invalidate();
+
+}
+
+
+// Draw the filled circle
+void CgPrjDlg::DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm)
+{
+	for (int j = -nRadius; j <= nRadius; j++) {
+		for (int i = -nRadius; i <= nRadius; i++) {
+
+			if (x + i >= 0 && x + i < nWidth && y + j >= 0 && y + j < nHeight) {
+				int distanceSquared = i * i + j * j;
+				if (distanceSquared <= nRadius * nRadius) {
+					fm[(y + j) * nPitch + (x + i)] = 0x00;
+				}
+			}
+		}
+	}
+}
+
+// Draw the circumference
+void CgPrjDlg::DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm)
+{
+	UpdateData(true);
+	
+	
+	// Draw the circumference of the circle
+	for (int angle = 0; angle < 360; angle++) {
+		int newX = x + static_cast<int>(nRadius * cos(angle * 3.14159 / 180.0));
+		int newY = y + static_cast<int>(nRadius * sin(angle * 3.14159 / 180.0));
+
+		if (newX >= 0 && newX < nWidth && newY >= 0 && newY < nHeight) {
+			fm[newY * nPitch + newX] = RGB(255,255,0);
+		}
+	}
+
+	m_pDlgImage->Invalidate();
+}
+
+
+
 
 
 void CgPrjDlg::OnBnClickedBtnGetData()
@@ -376,4 +482,11 @@ int CgPrjDlg::processImg(CRect rect)
 
 	cout << nRet << "\t" << millisec.count()*0.001 << "sec" << endl;
 	return nRet;
+}
+
+
+void CgPrjDlg::OnBnClickedBtnCalcCentroid()
+{
+	CalculateCentroid(m_nNum_Radius);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }

@@ -60,8 +60,8 @@ void CDlgImage::InitImage()
 {
 	//int nWidth = 4096 * 8;
 	//int nHeight = 4096 * 8;
-	int nWidth = 1024 ;
-	int nHeight = 1024 ;
+	int nWidth = 300 ;
+	int nHeight = 300 ;
 	int nBpp = 8;
 
 	m_image.Create(nWidth, -nHeight, nBpp);

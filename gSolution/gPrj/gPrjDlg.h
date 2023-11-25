@@ -2,7 +2,9 @@
 // gPrjDlg.h : 헤더 파일
 //
 #include "DlgImage.h"
-
+#pragma execution_character_set("utf-8")
+#define MAX_CIRCLES 100000 // 임의 지정
+#define SeedLimit 100000
 #pragma once
 
 
@@ -15,6 +17,15 @@ public:
 
 	CDlgImage *m_pDlgImage;
 	CDlgImage *m_pDlgImgResult;
+private:
+	struct Circle {
+		int x;
+		int y;
+	};
+
+	Circle circles[MAX_CIRCLES]; // 추가: 최대 원의 개수만큼 저장할 배열
+
+
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -47,5 +58,11 @@ public:
 	afx_msg void OnBnClickedBtnThread();
 	int processImg(CRect rect);
 	int m_nNum_Radius; // 원의 반지름
+	int m_nNum_CircleCnt;
+	void DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
+	void DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
+	void CalculateCentroid(int nRadius);
 	
+
+	afx_msg void OnBnClickedBtnCalcCentroid();
 };
