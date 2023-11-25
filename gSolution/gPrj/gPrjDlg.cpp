@@ -123,6 +123,13 @@ BOOL CgPrjDlg::OnInitDialog()
 	m_pDlgImage->Create(IDD_DLGIMAGE, this);
 	m_pDlgImage->ShowWindow(SW_SHOW);
 
+	m_pDlgImageColor = new DlgImageColor;
+	m_pDlgImageColor->Create(IDD_DlgImageColor, this);
+	m_pDlgImageColor->ShowWindow(SW_SHOW);
+
+
+
+
 	m_pDlgImgResult = new CDlgImage;
 	m_pDlgImgResult->Create(IDD_DLGIMAGE, this);
 	m_pDlgImgResult->ShowWindow(SW_SHOW);
@@ -192,8 +199,9 @@ void CgPrjDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
-	if(m_pDlgImage)		delete m_pDlgImage;
-	if(m_pDlgImgResult)	delete m_pDlgImgResult;
+	if(m_pDlgImage)		 delete m_pDlgImage;
+	if(m_pDlgImageColor) delete m_pDlgImageColor;
+	if(m_pDlgImgResult)	 delete m_pDlgImgResult;
 }
 
 void CgPrjDlg::callFunc(int n)
@@ -355,7 +363,6 @@ void CgPrjDlg::CalculateCentroid(int nRadius)
 
 	DrawCircumference(nRadius, nWidth, nHeight, nPitch, xCpos, yCpos, fm);
 
-
 	m_pDlgImage->Invalidate();
 
 }
@@ -385,8 +392,8 @@ void CgPrjDlg::DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitc
 	
 	// Draw the circumference of the circle
 	for (int angle = 0; angle < 360; angle++) {
-		int newX = x + static_cast<int>(nRadius * cos(angle * 3.14159 / 180.0));
-		int newY = y + static_cast<int>(nRadius * sin(angle * 3.14159 / 180.0));
+		int newX = x + static_cast<int>(nRadius * cos(angle * 3.141592 / 180.0));
+		int newY = y + static_cast<int>(nRadius * sin(angle * 3.141592 / 180.0));
 
 		if (newX >= 0 && newX < nWidth && newY >= 0 && newY < nHeight) {
 			fm[newY * nPitch + newX] = RGB(255,255,0);

@@ -181,8 +181,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CDlgColorImage.h" />
     <ClInclude Include="DlgImage.h" />
+    <ClInclude Include="DlgImageColor.h" />
     <ClInclude Include="gPrj.h" />
     <ClInclude Include="gPrjDlg.h" />
     <ClInclude Include="Process.h" />
@@ -191,8 +191,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CDlgColorImage.cpp" />
     <ClCompile Include="DlgImage.cpp" />
+    <ClCompile Include="DlgImageColor.cpp" />
     <ClCompile Include="gPrj.cpp" />
     <ClCompile Include="gPrjDlg.cpp" />
     <ClCompile Include="Process.cpp" />

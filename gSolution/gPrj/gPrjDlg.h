@@ -2,6 +2,7 @@
 // gPrjDlg.h : 헤더 파일
 //
 #include "DlgImage.h"
+#include "DlgImageColor.h"
 #pragma execution_character_set("utf-8")
 #define MAX_CIRCLES 100000 // 임의 지정
 #define SeedLimit 100000
@@ -17,6 +18,9 @@ public:
 
 	CDlgImage *m_pDlgImage;
 	CDlgImage *m_pDlgImgResult;
+	DlgImageColor *m_pDlgImageColor;
+
+
 private:
 	struct Circle {
 		int x;
