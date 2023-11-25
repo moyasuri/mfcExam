@@ -1,35 +1,35 @@
 
-// gPrjDlg.h : Çì´õ ÆÄÀÏ
+// gPrjDlg.h : í—¤ë” íŒŒì¼
 //
 #include "DlgImage.h"
 
 #pragma once
 
 
-// CgPrjDlg ´ëÈ­ »óÀÚ
+// CgPrjDlg ëŒ€í™” ìƒì
 class CgPrjDlg : public CDialogEx
 {
-// »ı¼ºÀÔ´Ï´Ù.
+// ìƒì„±ì…ë‹ˆë‹¤.
 public:
-	CgPrjDlg(CWnd* pParent = NULL);	// Ç¥ÁØ »ı¼ºÀÚÀÔ´Ï´Ù.
+	CgPrjDlg(CWnd* pParent = NULL);	// í‘œì¤€ ìƒì„±ìì…ë‹ˆë‹¤.
 
 	CDlgImage *m_pDlgImage;
 	CDlgImage *m_pDlgImgResult;
 
-// ´ëÈ­ »óÀÚ µ¥ÀÌÅÍÀÔ´Ï´Ù.
+// ëŒ€í™” ìƒì ë°ì´í„°ì…ë‹ˆë‹¤.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_GPRJ_DIALOG };
 #endif
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Áö¿øÀÔ´Ï´Ù.
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV ì§€ì›ì…ë‹ˆë‹¤.
 
 
-// ±¸ÇöÀÔ´Ï´Ù.
+// êµ¬í˜„ì…ë‹ˆë‹¤.
 protected:
 	HICON m_hIcon;
 
-	// »ı¼ºµÈ ¸Ş½ÃÁö ¸Ê ÇÔ¼ö
+	// ìƒì„±ëœ ë©”ì‹œì§€ ë§µ í•¨ìˆ˜
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
@@ -46,4 +46,6 @@ public:
 	afx_msg void OnBnClickedBtnGetData();
 	afx_msg void OnBnClickedBtnThread();
 	int processImg(CRect rect);
+	int m_nNum_Radius; // ì›ì˜ ë°˜ì§€ë¦„
+	
 };

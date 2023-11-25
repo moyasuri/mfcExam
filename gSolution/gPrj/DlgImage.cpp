@@ -1,4 +1,4 @@
-// DlgImage.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// DlgImage.cpp : êµ¬í˜„ íŒŒì¼ì…ë‹ˆë‹¤.
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CDlgImage ´ëÈ­ »óÀÚÀÔ´Ï´Ù.
+// CDlgImage ëŒ€í™” ìƒìì…ë‹ˆë‹¤.
 
 IMPLEMENT_DYNAMIC(CDlgImage, CDialogEx)
 
@@ -33,12 +33,12 @@ BEGIN_MESSAGE_MAP(CDlgImage, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CDlgImage ¸Ş½ÃÁö Ã³¸®±âÀÔ´Ï´Ù.
+// CDlgImage ë©”ì‹œì§€ ì²˜ë¦¬ê¸°ì…ë‹ˆë‹¤.
 
 #include "gPrjDlg.h"
 void CDlgImage::OnBnClickedBtnUpParent()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
 	static int n = 100;
 	CgPrjDlg *pDlg = (CgPrjDlg*)m_pParent;
 	pDlg->callFunc(n++);
@@ -49,17 +49,19 @@ BOOL CDlgImage::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowText(_T("Origin Image"));
-	MoveWindow(0, 0, 640, 480);
+	MoveWindow(0, 0, 640, 480); // ì—¬ê¸°ì„œ ì°½ì˜ í¬ê¸°ë¥¼ ì •í•˜ëŠ”ê±°ì•¼
 	InitImage();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // ¿¹¿Ü: OCX ¼Ó¼º ÆäÀÌÁö´Â FALSE¸¦ ¹İÈ¯ÇØ¾ß ÇÕ´Ï´Ù.
+				  // ì˜ˆì™¸: OCX ì†ì„± í˜ì´ì§€ëŠ” FALSEë¥¼ ë°˜í™˜í•´ì•¼ í•©ë‹ˆë‹¤.
 }
 
 void CDlgImage::InitImage()
 {
-	int nWidth = 4096 * 8;
-	int nHeight = 4096 * 8;
+	//int nWidth = 4096 * 8;
+	//int nHeight = 4096 * 8;
+	int nWidth = 1024 ;
+	int nHeight = 1024 ;
 	int nBpp = 8;
 
 	m_image.Create(nWidth, -nHeight, nBpp);
@@ -80,8 +82,8 @@ void CDlgImage::InitImage()
 void CDlgImage::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
-					   // ±×¸®±â ¸Ş½ÃÁö¿¡ ´ëÇØ¼­´Â CDialogEx::OnPaint()À»(¸¦) È£ÃâÇÏÁö ¸¶½Ê½Ã¿À.
+					   // TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+					   // ê·¸ë¦¬ê¸° ë©”ì‹œì§€ì— ëŒ€í•´ì„œëŠ” CDialogEx::OnPaint()ì„(ë¥¼) í˜¸ì¶œí•˜ì§€ ë§ˆì‹­ì‹œì˜¤.
 	if (m_image)
 		m_image.Draw(dc, 0, 0);
 
