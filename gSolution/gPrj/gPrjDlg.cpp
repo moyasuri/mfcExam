@@ -82,6 +82,8 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CgPrjDlg::OnBnClickedBtnGetData)
 	ON_BN_CLICKED(IDC_BTN_THREAD, &CgPrjDlg::OnBnClickedBtnThread)
 	ON_BN_CLICKED(IDC_BTN_CALC_CENTROID, &CgPrjDlg::OnBnClickedBtnCalcCentroid)
+	ON_BN_CLICKED(IDC_BTN_RESET, &CgPrjDlg::OnBnClickedBtnReset)
+	ON_BN_CLICKED(IDC_BTN_LINEAR, &CgPrjDlg::OnBnClickedBtnLinear)
 END_MESSAGE_MAP()
 
 
@@ -119,9 +121,9 @@ BOOL CgPrjDlg::OnInitDialog()
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	//ShowWindow(SW_SHOWMAXIMIZED); // 윈도우를 최대화 하는 역할
 	MoveWindow(0, 0, 1920, 1080);  // 크기 바꾸기
-	m_pDlgImage = new CDlgImage;
-	m_pDlgImage->Create(IDD_DLGIMAGE, this);
-	m_pDlgImage->ShowWindow(SW_SHOW);
+	//m_pDlgImage = new CDlgImage;
+	//m_pDlgImage->Create(IDD_DLGIMAGE, this);
+	//m_pDlgImage->ShowWindow(SW_SHOW);
 
 
 	// 노란색 원을 그리기 위하여 24bit dlg를 생성
@@ -129,10 +131,10 @@ BOOL CgPrjDlg::OnInitDialog()
 	m_pDlgImageColor->Create(IDD_DlgImageColor, this);
 	m_pDlgImageColor->ShowWindow(SW_SHOW);
 
-	m_pDlgImgResult = new CDlgImage;
-	m_pDlgImgResult->Create(IDD_DLGIMAGE, this);
-	m_pDlgImgResult->ShowWindow(SW_SHOW);
-	m_pDlgImgResult->MoveWindow(640, 0, 640, 480);
+	//m_pDlgImgResult = new CDlgImage;
+	//m_pDlgImgResult->Create(IDD_DLGIMAGE, this);
+	//m_pDlgImgResult->ShowWindow(SW_SHOW);
+	//m_pDlgImgResult->MoveWindow(640, 0, 640, 480);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -198,9 +200,9 @@ void CgPrjDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
-	if(m_pDlgImage)		 delete m_pDlgImage;
+	//if(m_pDlgImage)		 delete m_pDlgImage;
 	if(m_pDlgImageColor) delete m_pDlgImageColor;
-	if(m_pDlgImgResult)	 delete m_pDlgImgResult;
+	//if(m_pDlgImgResult)	 delete m_pDlgImgResult;
 }
 
 void CgPrjDlg::callFunc(int n)
@@ -268,6 +270,26 @@ void CgPrjDlg::OnBnClickedBtnProcess()
 	cout << nRet << "\t"<< millisec.count()*0.001 << "sec" <<endl;
 }
 
+void CgPrjDlg::ResetImage()
+{
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
+
+	// 화이트로 초기화
+	for (int j = 0; j < nHeight; j++) {
+		for (int i = 0; i < nWidth; i++) {
+			fm[j * nPitch + i * 3] = 255; // Blue
+			fm[j * nPitch + i * 3 + 1] = 255; // Green
+			fm[j * nPitch + i * 3 + 2] = 255; // Red
+		}
+	}
+
+	m_pDlgImageColor->Invalidate();
+}
+
 
 void CgPrjDlg::OnBnClickedBtnMakePattern()
 {
@@ -283,14 +305,7 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 	int nRadius = m_nNum_Radius;
 	int nLimit = 0;
 
-	// 화이트로 초기화
-	for (int j = 0; j < nHeight; j++) {
-		for (int i = 0; i < nWidth; i++) {
-			fm[j * nPitch + i * 3] = 255; // Blue
-			fm[j * nPitch + i * 3 + 1] = 255; // Green
-			fm[j * nPitch + i * 3 + 2] = 255; // Red
-		}
-	}
+	ResetImage();
 
 	// 두 중점사이의 거리
 	int minDistance = 2 * nRadius;
@@ -426,6 +441,44 @@ void CgPrjDlg::DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitc
 	m_pDlgImageColor->Invalidate();
 }
 
+// 일차함수 나타내보기
+void CgPrjDlg::DrawLinearEquation(int slope)
+{
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
+	
+	// 직선을 그릴 범위 설정
+	int startX = 0;
+	int endX = nWidth;
+	
+
+	// 직선을 그리는 반복문
+	for (int x = startX; x <= endX; x++)
+	{
+		// 직선 상의 해당 x에 대한 y값 계산
+		// 기울기가 - 인 이유는, 화면상에서 아래로 가면 y값이 + 이다.
+
+
+		int y = - slope * x + nHeight;
+
+		// 좌표가 이미지 범위 내에 있는지 확인
+		if (x >= 0 && x < nWidth && y >= 0 && y < nHeight)
+		{
+			// 해당 좌표에 색상 설정
+			int index = (y * nPitch + x * 3);
+			fm[index] = 0;         // Blue
+			fm[index + 1] = 0;     // Green
+			fm[index + 2] = 0;   // Red
+		}
+	}
+
+	// 이미지 갱신
+	m_pDlgImageColor->Invalidate();
+}
+
 void CgPrjDlg::OnBnClickedBtnGetData()
 {
 	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
@@ -514,5 +567,19 @@ int CgPrjDlg::processImg(CRect rect)
 void CgPrjDlg::OnBnClickedBtnCalcCentroid()
 {
 	CalculateCentroid(m_nNum_Radius);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CgPrjDlg::OnBnClickedBtnReset()
+{
+	ResetImage();
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CgPrjDlg::OnBnClickedBtnLinear()
+{
+	DrawLinearEquation(1);
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }

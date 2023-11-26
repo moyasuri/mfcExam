@@ -39,7 +39,7 @@ END_MESSAGE_MAP()
 BOOL DlgImageColor::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	MoveWindow(1280, 0, 640, 480); // 여기서 창의 크기를 정하는거야
+	MoveWindow(0, 0, 1000, 1000); // 창의크기 초기화
 	InitImage();
 	// TODO:  여기에 추가 초기화 작업을 추가합니다.
 
@@ -49,10 +49,11 @@ BOOL DlgImageColor::OnInitDialog()
 
 void DlgImageColor::InitImage()
 {
-	//int nWidth = 4096 * 8;
-	//int nHeight = 4096 * 8;
-	int nWidth = 300;
-	int nHeight = 300;
+	//int nWidth = 4096;
+	//int nHeight = 4096;
+	// 너무 크면 화면에 안보이니까 줄이자.
+	int nWidth = 1000;
+	int nHeight = 1000;
 	int nBpp = 24;
 
 	m_image.Create(nWidth, -nHeight, nBpp);

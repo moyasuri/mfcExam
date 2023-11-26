@@ -21,6 +21,7 @@ public:
 	DlgImageColor *m_pDlgImageColor;
 
 
+
 private:
 	struct Circle {
 		int x;
@@ -28,7 +29,10 @@ private:
 	};
 
 	Circle circles[MAX_CIRCLES]; // 추가: 최대 원의 개수만큼 저장할 배열
-
+	
+	
+	CSpinButtonCtrl m_spinControl;
+	int m_nSpinValue;
 
 
 // 대화 상자 데이터입니다.
@@ -66,7 +70,11 @@ public:
 	void DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
 	void DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
 	void CalculateCentroid(int nRadius);
+	void DrawLinearEquation(int slope);
+	void ResetImage();
 	
 
 	afx_msg void OnBnClickedBtnCalcCentroid();
+	afx_msg void OnBnClickedBtnReset();
+	afx_msg void OnBnClickedBtnLinear();
 };

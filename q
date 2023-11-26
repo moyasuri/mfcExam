@@ -1,0 +1,97 @@
+[33mcommit 1497689228914ad23d8fef47600fe984110d6291[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: moyasuri <moyasuri.hana@gmail.com>
+Date:   Sun Nov 26 01:03:07 2023 +0900
+
+    init bug fixed
+
+[33mcommit 76449fe9c8fe630e396b6ec2ca84382e4f0fb047[m
+Author: moyasuri <moyasuri.hana@gmail.com>
+Date:   Sun Nov 26 00:59:14 2023 +0900
+
+    window init fixing
+
+[33mcommit a02445afb8c04908b164bf06a0298427addd9b85[m
+Author: moyasuri <moyasuri.hana@gmail.com>
+Date:   Sun Nov 26 00:16:56 2023 +0900
+
+    create color window
+
+[33mcommit 2f618abc6e3af43c3c374d24132c5da92ec574ac[m
+Author: moyasuri <moyasuri.hana@gmail.com>
+Date:   Sat Nov 25 21:34:47 2023 +0900
+
+    cross, circumference added
+
+[33mcommit d9a2e08daac39eb7e58b83fede8e1cc56af5dc35[m
+Author: moyasuri <moyasuri.hana@gmail.com>
+Date:   Sat Nov 25 15:49:58 2023 +0900
+
+    draw circle function
+
+[33mcommit 5d86772fa3c4ebfaf661a5cf7a72119bad161f49[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Wed Jun 1 14:49:54 2022 +0900
+
+    thread를 이용해 이미지를 나누어 영상처리
+    
+    1. thread를 이용해 전체이미지를 분할해서 영상처리 해서 처리 속도를 줄여준다.
+
+[33mcommit ec8b0e4488bb118833e97620ad7026c1774cb60a[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Wed Jun 1 13:18:20 2022 +0900
+
+    make image pattern
+    
+    1. 일정 영역(사각형)을 만들고 그 무게 중심을 구한다.
+    2. 연습문제.
+      a) 사용자가 원의 사이즈를 입력(Edit Box)
+      b) 영역내의 일정 위치에 사용자가 입력한 사이즈의 원 랜덤하게 생성
+      c) 무게 중심 구하기로 원의 중심 찾기
+      d) dc를 이용해 원의 중심에 빨간 "+" 선과 노란 외곽선을 그림
+
+[33mcommit 68591ae0ec82299b4d1f8672e7dfc09b8579767f[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Sat May 28 19:40:49 2022 +0900
+
+    Image process / chrono
+    
+    1. 대용량 이미지 프로세스
+    2. chrono 사용법
+
+[33mcommit 33de31e610219d1ed3f6ed8af1b0102d1b457e9a[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Thu May 26 17:45:04 2022 +0900
+
+    포인트의 밝기값 다르게 설정
+
+[33mcommit 8887666107f32ba666378b0b6d9f2daf40b34f24[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Thu May 26 17:26:42 2022 +0900
+
+    우측 이미지에 정보 전달
+
+[33mcommit 2088a82902ff26aadb93ce6565b83510d7230d9a[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Thu May 26 09:24:06 2022 +0900
+
+    Dual Image Dialog Insert
+
+[33mcommit 81410dda387744d8f1ffe03db63788971edacac8[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Wed May 25 09:36:13 2022 +0900
+
+    inseert DlgImage
+    
+    이미지 다이얼로그를 삽입함
+
+[33mcommit 35acf5d5faea09b0d756561b1dbc16ffe747a635[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Wed May 25 09:03:36 2022 +0900
+
+    new dialog
+
+[33mcommit 90d945974d8f30d473b0530788f868575b9579fa[m
+Author: vgauge <50899531+vgauge@users.noreply.github.com>
+Date:   Wed May 25 08:50:58 2022 +0900
+
+    Initial commit
