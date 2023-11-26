@@ -59,6 +59,7 @@ CgPrjDlg::CgPrjDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_GPRJ_DIALOG, pParent)
 	, m_nNum_Radius(0)
 	, m_nNum_CircleCnt(0)
+	, m_nSlopeValue(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -69,6 +70,11 @@ void CgPrjDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_CIRCLE_RADIUS, m_nNum_Radius);
 	DDX_Text(pDX, IDC_CIRCLE_nCnt, m_nNum_CircleCnt);
+	DDX_Control(pDX, IDC_SLOPE_CONT, m_nSpinNumber);
+	DDX_Text(pDX, IDC_SLOPE_VALUE, m_nSlopeValue);
+	DDX_Control(pDX, IDC_SLIDER_R, m_sldrR);
+	DDX_Control(pDX, IDC_SLIDER_G, m_sldrG);
+	DDX_Control(pDX, IDC_SLIDER_B, m_sldrB);
 }
 
 BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
@@ -84,6 +90,10 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_CALC_CENTROID, &CgPrjDlg::OnBnClickedBtnCalcCentroid)
 	ON_BN_CLICKED(IDC_BTN_RESET, &CgPrjDlg::OnBnClickedBtnReset)
 	ON_BN_CLICKED(IDC_BTN_LINEAR, &CgPrjDlg::OnBnClickedBtnLinear)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SLOPE_CONT, &CgPrjDlg::OnDeltaposSlopeCont)
+	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_R, &CgPrjDlg::OnNMReleasedcaptureSliderR)
+	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_G, &CgPrjDlg::OnNMReleasedcaptureSliderG)
+	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_B, &CgPrjDlg::OnNMReleasedcaptureSliderB)
 END_MESSAGE_MAP()
 
 
@@ -135,6 +145,19 @@ BOOL CgPrjDlg::OnInitDialog()
 	//m_pDlgImgResult->Create(IDD_DLGIMAGE, this);
 	//m_pDlgImgResult->ShowWindow(SW_SHOW);
 	//m_pDlgImgResult->MoveWindow(640, 0, 640, 480);
+
+
+	// drawlinear 관련
+	// 기울기 1~100까지
+	m_nSpinNumber.SetRange(1, 100);
+	m_nSpinNumber.SetPos(1);
+
+
+	// RGB 관련
+
+	m_sldrR.SetRange(0, 255);
+	m_sldrG.SetRange(0, 255);
+	m_sldrB.SetRange(0, 255);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -344,7 +367,7 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 			}
 		} while (isOverlapping);
 
-		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, x, y, fm);
+		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, x, y, fm, 0, 0, 0);
 
 		// 중심점 배열에 추가
 		circles[k].x = x;
@@ -399,7 +422,7 @@ void CgPrjDlg::CalculateCentroid(int nRadius)
 }
 
 // 내부를 포함한 원 그리기
-void CgPrjDlg::DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm)
+void CgPrjDlg::DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm, int r, int g, int b)
 {
 	for (int j = -nRadius; j <= nRadius; j++) {
 		for (int i = -nRadius; i <= nRadius; i++) {
@@ -410,9 +433,9 @@ void CgPrjDlg::DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch
 				if (distanceSquared <= nRadius * nRadius) {
 					//fm[(y + j) * nPitch + (x + i)] = 0x00;
 					int index = (y + j) * nPitch + (x + i) * 3;
-					fm[index] = 0;         // Blue
-					fm[index + 1] = 0;     // Green
-					fm[index + 2] = 0;     // Red
+					fm[index] = b;         // Blue
+					fm[index + 1] = g;     // Green
+					fm[index + 2] = r;     // Red
 				}
 			}
 		}
@@ -461,8 +484,7 @@ void CgPrjDlg::DrawLinearEquation(int slope)
 		// 직선 상의 해당 x에 대한 y값 계산
 		// 기울기가 - 인 이유는, 화면상에서 아래로 가면 y값이 + 이다.
 
-
-		int y = - slope * x + nHeight;
+		int y = - slope * (x- nWidth / 2) + nHeight / 2;
 
 		// 좌표가 이미지 범위 내에 있는지 확인
 		if (x >= 0 && x < nWidth && y >= 0 && y < nHeight)
@@ -580,6 +602,149 @@ void CgPrjDlg::OnBnClickedBtnReset()
 
 void CgPrjDlg::OnBnClickedBtnLinear()
 {
-	DrawLinearEquation(1);
+	DrawLinearEquation(2);
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+
+
+
+void CgPrjDlg::OnDeltaposSlopeCont(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	*pResult = 0;
+
+	// GetPos() 함수는 low-order word로 16bit만큼 불러온다
+
+	
+	// previous값을 불러오게됨..
+	int PreviousSpinPosition = LOWORD(m_nSpinNumber.GetPos());
+	
+
+	UpdateData(TRUE);
+
+	// iDelta: 다음 spinvalue변화가 얼마나 많이 있을지
+	// +는 uparrow, -는 downarrow가 눌러짐
+
+	// 한계점을 넘지않게, 현재 세팅이 1~100임
+	
+	if ((PreviousSpinPosition == 1 && pNMUpDown->iDelta < 0) ||
+		(PreviousSpinPosition == 100 && pNMUpDown->iDelta > 0))
+	{
+		return;
+	}
+	
+	int currentSpinPosition = PreviousSpinPosition + pNMUpDown->iDelta;
+	ResetImage();
+	
+	DrawLinearEquation(currentSpinPosition);
+	
+
+}
+
+
+void CgPrjDlg::OnNMReleasedcaptureSliderR(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	CString str = _T("");
+	int nVal_R = m_sldrR.GetPos();
+	int nVal_G = m_sldrG.GetPos();
+	int nVal_B = m_sldrB.GetPos();
+
+	str.Format(_T("%d"), nVal_R);
+	SetDlgItemText(IDC_COLOR_R,str);
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
+
+	
+	int nCount = m_nNum_CircleCnt;
+	int nRadius = m_nNum_Radius;
+
+	
+
+	for (int k = 0; k < nCount; k++) {
+
+		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, circles[k].x, circles[k].y, fm, nVal_R, nVal_G, nVal_B);
+
+	}
+
+	m_pDlgImageColor->Invalidate();
+
+	*pResult = 0;
+}
+
+
+void CgPrjDlg::OnNMReleasedcaptureSliderG(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	CString str = _T("");
+	int nVal_R = m_sldrR.GetPos();
+	int nVal_G = m_sldrG.GetPos();
+	int nVal_B = m_sldrB.GetPos();
+
+	str.Format(_T("%d"), nVal_G);
+	SetDlgItemText(IDC_COLOR_R, str);
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
+
+
+	int nCount = m_nNum_CircleCnt;
+	int nRadius = m_nNum_Radius;
+
+
+
+	for (int k = 0; k < nCount; k++) {
+
+		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, circles[k].x, circles[k].y, fm, nVal_R, nVal_G, nVal_B);
+
+	}
+
+	m_pDlgImageColor->Invalidate();
+
+	*pResult = 0;
+}
+
+
+void CgPrjDlg::OnNMReleasedcaptureSliderB(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	CString str = _T("");
+	int nVal_R = m_sldrR.GetPos();
+	int nVal_G = m_sldrG.GetPos();
+	int nVal_B = m_sldrB.GetPos();
+
+	str.Format(_T("%d"), nVal_B);
+	SetDlgItemText(IDC_COLOR_R, str);
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
+	int nWidth = m_pDlgImageColor->m_image.GetWidth();
+	int nHeight = m_pDlgImageColor->m_image.GetHeight();
+	int nPitch = m_pDlgImageColor->m_image.GetPitch();
+
+
+	int nCount = m_nNum_CircleCnt;
+	int nRadius = m_nNum_Radius;
+
+
+
+	for (int k = 0; k < nCount; k++) {
+
+		DrawFilledCircle(nRadius, nWidth, nHeight, nPitch, circles[k].x, circles[k].y, fm, nVal_R, nVal_G, nVal_B);
+
+	}
+
+	m_pDlgImageColor->Invalidate();
+
+	*pResult = 0;
 }

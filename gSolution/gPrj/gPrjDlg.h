@@ -31,8 +31,6 @@ private:
 	Circle circles[MAX_CIRCLES]; // 추가: 최대 원의 개수만큼 저장할 배열
 	
 	
-	CSpinButtonCtrl m_spinControl;
-	int m_nSpinValue;
 
 
 // 대화 상자 데이터입니다.
@@ -67,7 +65,7 @@ public:
 	int processImg(CRect rect);
 	int m_nNum_Radius; // 원의 반지름
 	int m_nNum_CircleCnt;
-	void DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
+	void DrawFilledCircle(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm, int r, int g, int b);
 	void DrawCircumference(int nRadius, int nWidth, int nHeight, int nPitch, int x, int y, unsigned char* fm);
 	void CalculateCentroid(int nRadius);
 	void DrawLinearEquation(int slope);
@@ -77,4 +75,16 @@ public:
 	afx_msg void OnBnClickedBtnCalcCentroid();
 	afx_msg void OnBnClickedBtnReset();
 	afx_msg void OnBnClickedBtnLinear();
+	
+	CSpinButtonCtrl m_nSpinNumber;
+	afx_msg void OnDeltaposSlopeCont(NMHDR* pNMHDR, LRESULT* pResult);
+	int m_nSlopeValue;
+	CSliderCtrl m_sldrR;
+	CSliderCtrl m_sldrG;
+	CSliderCtrl m_sldrB;
+	afx_msg void OnNMReleasedcaptureSliderR(NMHDR* pNMHDR, LRESULT* pResult);
+
+
+	afx_msg void OnNMReleasedcaptureSliderG(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNMReleasedcaptureSliderB(NMHDR* pNMHDR, LRESULT* pResult);
 };
