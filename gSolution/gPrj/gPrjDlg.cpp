@@ -6,7 +6,6 @@
 #include "gPrj.h"
 #include "gPrjDlg.h"
 #include "afxdialogex.h"
-
 #include <iostream>
 using namespace std;
 
@@ -130,7 +129,7 @@ BOOL CgPrjDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	//ShowWindow(SW_SHOWMAXIMIZED); // 윈도우를 최대화 하는 역할
-	MoveWindow(0, 0, 1920, 1080);  // 크기 바꾸기
+	MoveWindow(0, 0, 1500, 1000);  // 크기 바꾸기
 	//m_pDlgImage = new CDlgImage;
 	//m_pDlgImage->Create(IDD_DLGIMAGE, this);
 	//m_pDlgImage->ShowWindow(SW_SHOW);
@@ -147,18 +146,24 @@ BOOL CgPrjDlg::OnInitDialog()
 	//m_pDlgImgResult->MoveWindow(640, 0, 640, 480);
 
 
-	// drawlinear 관련
-	// 기울기 1~100까지
-	m_nSpinNumber.SetRange(1, 100);
+	
+	// Drawlinear 
+	
+	m_nSpinNumber.SetRange(1, 100); // 기울기 상하한
 	m_nSpinNumber.SetPos(1);
 
 
-	// RGB 관련
+	// RGB 
 
 	m_sldrR.SetRange(0, 255);
 	m_sldrG.SetRange(0, 255);
 	m_sldrB.SetRange(0, 255);
+	SetDlgItemText(IDC_COLOR_R, _T("0"));
+	SetDlgItemText(IDC_COLOR_G, _T("0"));
+	SetDlgItemText(IDC_COLOR_B, _T("0"));
 
+
+	
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -602,7 +607,8 @@ void CgPrjDlg::OnBnClickedBtnReset()
 
 void CgPrjDlg::OnBnClickedBtnLinear()
 {
-	DrawLinearEquation(2);
+	ResetImage();
+	DrawLinearEquation(1);
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
 
@@ -690,7 +696,7 @@ void CgPrjDlg::OnNMReleasedcaptureSliderG(NMHDR* pNMHDR, LRESULT* pResult)
 	int nVal_B = m_sldrB.GetPos();
 
 	str.Format(_T("%d"), nVal_G);
-	SetDlgItemText(IDC_COLOR_R, str);
+	SetDlgItemText(IDC_COLOR_G, str);
 
 	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
 	int nWidth = m_pDlgImageColor->m_image.GetWidth();
@@ -725,7 +731,7 @@ void CgPrjDlg::OnNMReleasedcaptureSliderB(NMHDR* pNMHDR, LRESULT* pResult)
 	int nVal_B = m_sldrB.GetPos();
 
 	str.Format(_T("%d"), nVal_B);
-	SetDlgItemText(IDC_COLOR_R, str);
+	SetDlgItemText(IDC_COLOR_B, str);
 
 	unsigned char* fm = (unsigned char*)m_pDlgImageColor->m_image.GetBits();
 	int nWidth = m_pDlgImageColor->m_image.GetWidth();
